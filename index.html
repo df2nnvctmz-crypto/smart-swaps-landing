@@ -3,6 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript">
+  // Single Page Apps for GitHub Pages — https://github.com/rafgraph/spa-github-pages
+  // Reverses the redirect from 404.html: turns '?/kontakt' back into the real path via
+  // replaceState, before the app's own script reads window.location to pick a page.
+  (function (l) {
+    if (l.search[1] === '/') {
+      var decoded = l.search
+        .slice(1)
+        .split('&')
+        .map(function (s) {
+          return s.replace(/~and~/g, '&');
+        })
+        .join('?');
+      window.history.replaceState(null, '', l.pathname.slice(0, -1) + decoded + l.hash);
+    }
+  })(window.location);
+</script>
 <title>Smart Swaps – Kassenbon scannen. Bessere Wahl treffen.</title>
 <meta name="description" content="Smart Swaps liest deinen Kassenbon und zeigt dir sofort die Nährwerte deiner Einkäufe – mit besseren Alternativen und passenden Rezepten. Kostenlos, werbefrei, 100% auf deinem Gerät.">
 <meta name="theme-color" content="#3B964E">
@@ -809,8 +826,8 @@
   }
 
   function currentPage() {
-    var hash = window.location.hash.replace(/^#\/?/, '');
-    return VALID_PAGES.indexOf(hash) !== -1 ? hash : 'home';
+    var path = window.location.pathname.replace(/^\/|\/$/g, '');
+    return VALID_PAGES.indexOf(path) !== -1 ? path : 'home';
   }
 
   function render() {
@@ -838,10 +855,14 @@
     var target = e.target.closest('[data-nav]');
     if (!target) return;
     var page = target.getAttribute('data-nav');
-    window.location.hash = page === 'home' ? '/' : '/' + page;
+    var path = page === 'home' ? '/' : '/' + page;
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+    }
+    render();
   });
 
-  window.addEventListener('hashchange', render);
+  window.addEventListener('popstate', render);
   applyLanguage(currentLang);
   render();
 
